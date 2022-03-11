@@ -1,4 +1,6 @@
 import requests
+import yaml
+from yaml.loader import SafeLoader
 import time
 import json
 from bs4 import BeautifulSoup
@@ -8,6 +10,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 
 
+CONFIG_FILE = "./config.yaml"
 URL = "https://wunderflats.com"
 MAX_PAGE = 100
 
@@ -21,6 +24,12 @@ def getTextFromHtml(elem):
     if elem:
         return elem.getText()
     return ""
+
+
+def getConfig():
+    with open(CONFIG_FILE, "r") as file:
+        data = yaml.load(file, Loader=SafeLoader)
+    return data
 
 
 def extract_flat_infos(flatURL):
@@ -64,14 +73,15 @@ def extract_flat_infos(flatURL):
 
 
 if __name__ == "__main__":
+    conf = getConfig()
     page = 1
     last_page = 1
 
-    flatsAvailable = []
+    allFlats = []
     while page <= last_page and page <= MAX_PAGE:
-        filters = "?minPrice=0&maxPrice=1600"
-        url = "https://wunderflats.com/en/furnished-apartments/berlin/" + \
-            str(page) + filters
+        filters = "?minPrice={}&maxPrice={}".format(conf["minPrice"], conf["maxPrice"])
+        url = "https://wunderflats.com/en/furnished-apartments/{city}/{page}/{filters}".format(city=conf["city"], page=page, filters=filters)
+
         print("url = ", url)
         site = requests.get(url)
         soup = BeautifulSoup(site.content, "html.parser")
@@ -101,12 +111,24 @@ if __name__ == "__main__":
                      "beds": infos["beds"],
                      "minStay": infos["minStay"],
                      }
-                flatsAvailable.append(a)
+                allFlats.append(a)
 
                 print(a)
         last_page -= 1
         page += 1
         time.sleep(5)
 
-    with open("availabilities.json", "w") as file:
-        file.write(json.dumps(flatsAvailable))
+    # store all flats
+    with open("all_flats.json", "w") as file:
+        file.write(json.dumps(allFlats))
+
+    # check for availability
+    flatMatchingAvailabitlies = []
+    for f in allFlats:
+        if conf["availableFrom"] in f["calendar"]:
+            flatMatchingAvailabitlies.append(f)
+
+    with open("flats_available.json", "w") as file:
+        file.write(json.dumps(flatMatchingAvailabitlies))
+
+    print("flatMatchingAvailabitlies: \n", flatMatchingAvailabitlies)
