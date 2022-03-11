@@ -17,6 +17,12 @@ WebDriver = webdriver.Chrome(service=Service(
     ChromeDriverManager().install()), options=options)
 
 
+def getTextFromHtml(elem):
+    if elem:
+        return elem.getText()
+    return ""
+
+
 def extract_flat_infos(flatURL):
     if not flatURL:
         return
@@ -28,6 +34,15 @@ def extract_flat_infos(flatURL):
 
     availableList = []
     if ret:
+        rooms = ret.find(
+            "span", { "class": "ListingDetails-statsElt rooms" })
+        beds = ret.find(
+            "span", { "class": "ListingDetails-statsElt beds"})
+        minStay = ret.find(
+            "span", { "class": "ListingDetails-statsElt minBookingDuration" })
+        price = ret.find(
+            "strong", { "class": "ListingPriceText-value" })
+
         partly_available = ret.find_all(
             "li", class_="MonthlyAvailabilityViewer-month--partlyAvailable")
         available = ret.find_all(
@@ -39,7 +54,13 @@ def extract_flat_infos(flatURL):
         for a in available:
             availableList.append(a.getText())
 
-        return availableList
+        return {
+            "availabilities": availableList,
+            "price": getTextFromHtml(price),
+            "rooms": getTextFromHtml(rooms),
+            "beds": getTextFromHtml(beds),
+            "minStay": getTextFromHtml(minStay)
+        }
 
 
 if __name__ == "__main__":
@@ -49,7 +70,8 @@ if __name__ == "__main__":
     flatsAvailable = []
     while page <= last_page and page <= MAX_PAGE:
         filters = "?minPrice=0&maxPrice=1600"
-        url = "https://wunderflats.com/en/furnished-apartments/berlin/" + str(page) + filters
+        url = "https://wunderflats.com/en/furnished-apartments/berlin/" + \
+            str(page) + filters
         print("url = ", url)
         site = requests.get(url)
         soup = BeautifulSoup(site.content, "html.parser")
@@ -71,8 +93,14 @@ if __name__ == "__main__":
             for flat in flats:
                 flatURL = URL + flat
 
-                availabilities = extract_flat_infos(flatURL)
-                a = {"url": flatURL, "calendar": availabilities}
+                infos = extract_flat_infos(flatURL)
+                a = {"url": flatURL,
+                     "calendar": infos["availabilities"],
+                     "price": infos["price"],
+                     "rooms": infos["rooms"],
+                     "beds": infos["beds"],
+                     "minStay": infos["minStay"],
+                     }
                 flatsAvailable.append(a)
 
                 print(a)
