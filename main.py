@@ -47,7 +47,7 @@ if __name__ == "__main__":
     last_page = 1
 
     flatsAvailable = []
-    while page <= last_page and page < MAX_PAGE:
+    while page <= last_page and page <= MAX_PAGE:
         filters = "?minPrice=0&maxPrice=1600"
         url = "https://wunderflats.com/en/furnished-apartments/berlin/" + str(page) + filters
         print("url = ", url)
