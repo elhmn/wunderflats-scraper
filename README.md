@@ -19,6 +19,16 @@ source ./venv/bin/activate
 python -m main
 ```
 
+## Other commands
+You can inspect other commands by running `make`
+
+```
+install-deps: setup your dev environment
+run: run the message scraper
+test: test your code
+help: show help
+```
+
 ## Config
 
 You can configure the scraper by editing the `config.yaml` file.
