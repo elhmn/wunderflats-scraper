@@ -19,6 +19,9 @@ source ./venv/bin/activate
 python -m main
 ```
 
+It generates a file containing all the flats listed on the website `hanover_all_flats.json`
+ and `hanover_flats_available.json` a list of flats available from `availableFrom`. 
+
 ## Other commands
 You can inspect other commands by running `make`
 
