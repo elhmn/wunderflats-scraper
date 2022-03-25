@@ -117,9 +117,10 @@ if __name__ == "__main__":
         last_page -= 1
         page += 1
         time.sleep(5)
+    WebDriver.close()
 
     # store all flats
-    with open("all_flats.json", "w") as file:
+    with open("{}_all_flats.json".format(conf["city"]), "w") as file:
         file.write(json.dumps(allFlats))
 
     # check for availability
@@ -128,7 +129,7 @@ if __name__ == "__main__":
         if conf["availableFrom"] in f["calendar"]:
             flatMatchingAvailabitlies.append(f)
 
-    with open("flats_available.json", "w") as file:
+    with open("{}_flats_available.json".format(conf["city"]), "w") as file:
         file.write(json.dumps(flatMatchingAvailabitlies))
 
     print("flatMatchingAvailabitlies: \n", flatMatchingAvailabitlies)

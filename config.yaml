@@ -1,8 +1,8 @@
 #city should be written in lower case
-city: "berlin"
+city: "hanover"
 minPrice: 0
-maxPrice: 900
+maxPrice: 1400
 #availableFrom is the time from when the flats should be available
 #and can be one of
 #Jan <Y>, Feb Y, Mar Y, Apr Y, May Y, Jun Y, Jul Y, Aug Y, Sep Y, Oct, Nov Y, Dev Y
-availableFrom: Jul 2022
+availableFrom: Apr 2022
